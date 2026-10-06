@@ -1,0 +1,1 @@
+<img src="{{ asset('storage/logo/neper.png') }}" alt="logo" class="w-40 h-40">
