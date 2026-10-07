@@ -139,4 +139,18 @@ class DashboardController extends Controller
             'telat'  => $dataTelat,
         ];
     }
+
+    /**
+     * =====================================
+     * DASHBOARD KHUSUS ORANG TUA
+     * =====================================
+     */
+    public function ortu(Request $request)
+    {
+        $user = Auth::user();
+        
+        return view('dashboard.ortu', [
+            'user' => $user
+        ]);
+    }
 }

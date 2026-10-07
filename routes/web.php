@@ -39,6 +39,15 @@ Route::middleware(['auth', 'hakAkses:nusabot,full,general'])->group(function () 
 
 /*
 |--------------------------------------------------------------------------
+| Orang Tua Routes (Role Orang Tua)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'hakAkses:orang_tua'])->group(function () {
+    Route::get('/dashboard-ortu', [DashboardController::class, 'ortu'])->name('dashboard.ortu');
+});
+
+/*
+|--------------------------------------------------------------------------
 | General User Routes (Role General)
 |--------------------------------------------------------------------------
 */

@@ -39,6 +39,15 @@ class AuthenticatedSessionController extends Controller
             
             $request->session()->regenerate();
 
+            $hakAkses = \Illuminate\Support\Facades\DB::table('jabatan_status')
+                ->join('hak_akses', 'jabatan_status.hak_akses', '=', 'hak_akses.id')
+                ->where('jabatan_status.id', $user->jabatan_status)
+                ->value('hak_akses.hak');
+
+            if ($hakAkses === 'orang_tua') {
+                return redirect()->intended(route('dashboard.ortu', absolute: false));
+            }
+
             return redirect()->intended(route('dashboard.index', absolute: false));
         }
 
