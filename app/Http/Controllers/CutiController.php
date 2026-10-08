@@ -244,4 +244,72 @@ public function update(Request $request, string $id)
             'message' => $cuti ? 'Karyawan sedang cuti' : 'Karyawan tidak cuti'
         ]);
     }
+
+    // ============================================
+    // FUNGSI KHUSUS SISWA (DASHBOARD SISWA)
+    // ============================================
+
+    public function izinSiswaIndex(Request $request)
+    {
+        $user = auth()->user();
+        
+        $cuti = Cuti::where('nomor_induk', $user->nomor_induk)
+            ->orderBy('tanggal', 'desc')
+            ->paginate(10);
+            
+        return view('cuti.siswa_index', compact('cuti'));
+    }
+
+    public function izinSiswaCreate()
+    {
+        return view('cuti.siswa_create');
+    }
+
+    public function izinSiswaStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'tanggal_mulai' => 'required|date|after_or_equal:today',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'kategori' => 'required|in:Izin,Sakit',
+            'alasan' => 'required|string|max:1000',
+            'bukti_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
+        ], [
+            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
+            'tanggal_mulai.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
+            'tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
+            'kategori.required' => 'Kategori wajib dipilih.',
+            'alasan.required' => 'Alasan/Keterangan wajib diisi.',
+            'bukti_file.mimes' => 'Format file tidak didukung. Gunakan PDF, JPG, atau PNG.',
+            'bukti_file.max' => 'Ukuran file maksimal 2MB.'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = auth()->user();
+
+        // Handle File Upload
+        $path = null;
+        if ($request->hasFile('bukti_file')) {
+            $path = $request->file('bukti_file')->store('bukti_izin', 'public');
+        }
+
+        // Simpan permohonan
+        Cuti::create([
+            'nomor_induk' => $user->nomor_induk,
+            'tanggal' => $request->tanggal_mulai, // default legacy column
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
+            'kategori' => $request->kategori,
+            'alasan' => $request->alasan,
+            'bukti_file' => $path,
+            'status_persetujuan' => 'Pending'
+        ]);
+
+        return redirect()->route('siswa.izin.index')
+            ->with('success', 'Pengajuan izin/sakit berhasil dikirim dan menunggu persetujuan.');
+    }
 }

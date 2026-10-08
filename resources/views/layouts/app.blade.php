@@ -171,10 +171,6 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <div class="hide-sm text-end me-1" style="line-height:1.15">
-                        <div id="live-clock" class="font-bold text-slate-800" style="font-size:1rem;font-variant-numeric:tabular-nums">--:--:--</div>
-                        <div class="page-sub">Waktu setempat</div>
-                    </div>
 
                     <div class="relative">
                         <div class="user-chip" id="userChip" role="button" tabindex="0">
@@ -248,15 +244,13 @@
         chip.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('open'); });
         document.addEventListener('click', () => menu.classList.remove('open'));
 
-        // tanggal & jam
+        // tanggal
         const tgl = document.getElementById('today-label');
-        const jam = document.getElementById('live-clock');
-        function tick() {
+        function setTodayLabel() {
             const n = new Date();
             tgl.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-            jam.textContent = n.toLocaleTimeString('id-ID', { hour12: false }).replace(/\./g, ':');
         }
-        tick(); setInterval(tick, 1000);
+        setTodayLabel();
     </script>
 </body>
 

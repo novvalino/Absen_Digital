@@ -267,4 +267,46 @@ class AbsensiController extends Controller
 //     ]);
 // }
 
+    public function storeSiswa(Request $request)
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $kategori = $request->input('kategori'); // 1 = masuk, 4 = pulang
+
+        if (!in_array($kategori, [1, 4])) {
+            return back()->with('error', 'Kategori presensi tidak valid.');
+        }
+
+        $now = now();
+        $today = $now->toDateString();
+        
+        // Cek apakah sudah absen hari ini untuk kategori yang sama
+        $sudahAbsen = Absensi::where('nomor_induk', $user->nomor_induk)
+            ->whereDate('absen', $today)
+            ->where('kategori', $kategori)
+            ->exists();
+
+        if ($sudahAbsen) {
+            $namaAksi = $kategori == 1 ? 'Masuk' : 'Pulang';
+            return back()->with('error', "Anda sudah melakukan Absen $namaAksi hari ini.");
+        }
+
+        // Logic batas absen 
+        $jamTarget = $this->defaultJam[(string)$kategori] ?? null;
+        $absenMaks = null;
+        if ($jamTarget) {
+            $absenMaks = Carbon::parse($today . ' ' . $jamTarget);
+        }
+
+        Absensi::create([
+            'nomor_induk' => $user->nomor_induk,
+            'absen' => $now,
+            'absen_maks' => $absenMaks,
+            'kategori' => $kategori,
+            'idmesin' => null // presensi web
+        ]);
+
+        $namaAksi = $kategori == 1 ? 'Masuk' : 'Pulang';
+        return back()->with('success', "Absen $namaAksi berhasil disimpan!");
+    }
+
 }

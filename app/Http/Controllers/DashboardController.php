@@ -28,7 +28,7 @@ class DashboardController extends Controller
          * hak_akses: 0, 1
          * ===============================
          */
-        if (in_array($hakAkses, [0, 1])) {
+        if (in_array($hakAkses, [0, 1]) || $user->tag === 'admin') {
 
             $cabangGedungId = $request->get('cabangGedung');
 
@@ -46,39 +46,97 @@ class DashboardController extends Controller
                 $cabangGedungId,
                 null // ❗ tidak filter user
             );
+
+            return view('dashboard.index', [
+                'cabangGedungList' => $cabangGedungList,
+                'labels'          => $stats['labels'],
+                'tepatWaktu'      => $stats['tepat'],
+                'terlambat'       => $stats['telat'],
+                'lokasiCabang'    => $lokasiCabang,
+                'cabangGedungId'  => $cabangGedungId ?? null,
+                'hakAkses'        => $hakAkses
+            ]);
         }
         /**
          * ===============================
-         * USER BIASA / GENERAL
-         * hak_akses: 2
+         * USER BIASA / SISWA
          * ===============================
          */
         else {
+            // Logika Dashboard Siswa
+            $nomorInduk = $user->nomor_induk;
 
-            $cabangGedungId = $user->cabang_gedung;
-            $cabangGedungList = []; // dropdown hilang
+            // 2. $totalHariMasuk: count presensi bulan ini dengan status 'hadir' (kategori 1 = masuk)
+            $totalHariMasuk = Absensi::where('nomor_induk', $nomorInduk)
+                ->whereMonth('absen', $month)
+                ->whereYear('absen', $year)
+                ->where('kategori', 1)
+                ->count();
 
-            $lokasiCabang = DB::table('cabang_gedung')
-                ->where('id', $cabangGedungId)
-                ->value('lokasi');
+            // 3. $totalHariEfektif: total hari berjalan di bulan ini
+            $totalHariEfektif = Carbon::now()->day;
 
-            $stats = $this->getMonthlyStats(
-                $month,
-                $year,
-                null, // ❗ cabang tidak dipakai
-                $user->nomor_induk // ✅ FILTER USER LOGIN
-            );
+            // 4. $persentaseKehadiran: persentase tepat waktu
+            $persentaseKehadiran = ($totalHariMasuk / max($totalHariEfektif, 1)) * 100;
+
+            // 5. $riwayatTerbaru: ambil 5 data terakhir dari tabel presensi khusus user login
+            $riwayatTerbaru = Absensi::where('nomor_induk', $nomorInduk)
+                ->orderBy('absen', 'desc')
+                ->take(5)
+                ->get();
+
+            // Process $riwayatTerbaru to get status
+            foreach ($riwayatTerbaru as $riwayat) {
+                if (empty($riwayat->absen)) continue;
+                
+                $waktuAbsen = Carbon::parse($riwayat->absen);
+                
+                $kategoriLabel = '-';
+                if ($riwayat->kategori == 1) $kategoriLabel = 'Presensi Masuk';
+                elseif ($riwayat->kategori == 2) $kategoriLabel = 'Mulai Istirahat';
+                elseif ($riwayat->kategori == 3) $kategoriLabel = 'Selesai Istirahat';
+                elseif ($riwayat->kategori == 4) $kategoriLabel = 'Presensi Pulang';
+                
+                $riwayat->kategori_label = $kategoriLabel;
+                
+                // default jam
+                $defaultJam = [
+                    '1' => '08:00:00',
+                    '2' => '12:00:00',
+                    '3' => '13:00:00',
+                    '4' => '17:00:00',
+                ];
+                
+                $jamTarget = $defaultJam[$riwayat->kategori] ?? null;
+                $riwayat->status_label = 'Tepat Waktu';
+                
+                if ($jamTarget) {
+                    $target = Carbon::parse($waktuAbsen->toDateString() . ' ' . $jamTarget);
+                    
+                    if ($riwayat->kategori == 1) { // Masuk
+                        if ($waktuAbsen->greaterThan($target->copy()->addMinutes(15))) {
+                            $selisih = $waktuAbsen->diffInMinutes($target);
+                            $riwayat->status_label = "Terlambat $selisih Menit";
+                        }
+                    } elseif ($riwayat->kategori == 4) { // Pulang
+                        if ($waktuAbsen->lessThan($target)) {
+                            $riwayat->status_label = "Pulang Cepat";
+                        }
+                    }
+                }
+                
+                // Check if it's Izin / Sakit logic? Cuti table handles Izin/Sakit. 
+                // But if they just mean based on kategori string, we handle it if needed.
+            }
+
+            return view('dashboard.siswa', [
+                'totalHariMasuk' => $totalHariMasuk,
+                'totalHariEfektif' => $totalHariEfektif,
+                'persentaseKehadiran' => $persentaseKehadiran,
+                'riwayatTerbaru' => $riwayatTerbaru,
+                'hakAkses' => $hakAkses
+            ]);
         }
-
-        return view('dashboard.index', [
-            'cabangGedungList' => $cabangGedungList,
-            'labels'          => $stats['labels'],
-            'tepatWaktu'      => $stats['tepat'],
-            'terlambat'       => $stats['telat'],
-            'lokasiCabang'    => $lokasiCabang,
-            'cabangGedungId'  => $cabangGedungId ?? null,
-            'hakAkses'        => $hakAkses
-        ]);
     }
 
     /**
