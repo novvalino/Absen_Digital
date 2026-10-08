@@ -15,7 +15,7 @@ class PenggunaSeeder extends Seeder
                 'nama' => 'Nusabot.id',
                 'tag' => '',
                 'jabatan_status' => 1,
-                'cabang_gedung' => 0,
+                'cabang_gedung' => 1,
                 'password' => '$2y$12$MDwJSBNRR0b.8B3HIlsOB.ZGk5Bx9CU8yw6AY7g1VuA8T0lYMPAjW',
                 'aktif' => '1',
             ],

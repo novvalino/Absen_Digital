@@ -27,8 +27,22 @@
         </div>
 
         <!-- Navigation Links -->
+        @php
+            $userHakAkses = \Illuminate\Support\Facades\DB::table('jabatan_status')
+                ->join('hak_akses', 'jabatan_status.hak_akses', '=', 'hak_akses.id')
+                ->where('jabatan_status.id', Auth::user()->jabatan_status)
+                ->value('hak_akses.hak');
+        @endphp
         <nav class="px-2 space-y-1.5 mt-2">
-            
+            @if($userHakAkses === 'orang_tua')
+                <!-- Dashboard Orang Tua -->
+                <a href="{{ route('dashboard.ortu') }}" 
+                   class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('dashboard-ortu*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
+                   title="Dashboard">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <span class="sidebar-text truncate">Dashboard Ortu</span>
+                </a>
+            @else
             <!-- 1. Dashboard -->
             <a href="{{ url('pages/dashboard') }}" 
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/dashboard*') || request()->is('dashboard*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
@@ -116,6 +130,7 @@
                     </a>
                 </div>
             </div>
+            @endif
 
         </nav>
     </div>

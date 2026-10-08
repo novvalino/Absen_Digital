@@ -197,4 +197,65 @@ class DashboardController extends Controller
             'telat'  => $dataTelat,
         ];
     }
+
+    /**
+     * =====================================
+     * DASHBOARD KHUSUS ORANG TUA
+     * =====================================
+     */
+    public function ortu(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Ambil data anak beserta absensi mereka untuk hari ini
+        $anakAnak = $user->anak()->get();
+        $today = Carbon::today();
+
+        // Siapkan data riwayat (gabungan semua anak)
+        $riwayatAbsensi = collect();
+
+        foreach ($anakAnak as $anak) {
+            // Ambil absensi masuk (kategori 1) hari ini
+            $absenHariIni = DB::table('absensi')
+                ->where('nomor_induk', $anak->nomor_induk)
+                ->where('kategori', 1)
+                ->whereDate('absen', $today)
+                ->first();
+
+            $anak->absen_hari_ini = $absenHariIni;
+
+            if ($absenHariIni && $absenHariIni->absen) {
+                // Tentukan status (Tepat/Telat)
+                $waktuAbsen = Carbon::parse($absenHariIni->absen);
+                $jamMasuk = Carbon::parse($today->toDateString() . ' 08:00:00');
+                $anak->jam_masuk = $waktuAbsen->format('H:i');
+                $anak->status_absen = $waktuAbsen->lte($jamMasuk) ? 'Tepat Waktu' : 'Terlambat';
+            } else {
+                $anak->jam_masuk = '-';
+                $anak->status_absen = 'Belum Absen';
+            }
+
+            // Ambil riwayat absensi 5 terakhir untuk anak ini
+            $riwayat = DB::table('absensi')
+                ->where('nomor_induk', $anak->nomor_induk)
+                ->orderBy('absen', 'desc')
+                ->limit(5)
+                ->get()
+                ->map(function ($item) use ($anak) {
+                    $item->nama_anak = $anak->nama;
+                    return $item;
+                });
+            
+            $riwayatAbsensi = $riwayatAbsensi->concat($riwayat);
+        }
+
+        // Urutkan riwayat absensi gabungan dari yang terbaru
+        $riwayatAbsensi = $riwayatAbsensi->sortByDesc('absen')->take(10);
+
+        return view('dashboard.ortu', [
+            'user' => $user,
+            'anakAnak' => $anakAnak,
+            'riwayatAbsensi' => $riwayatAbsensi
+        ]);
+    }
 }

@@ -39,7 +39,11 @@ class AuthenticatedSessionController extends Controller
             
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard.index', absolute: false));
+            if ($user->jabatan_status == 4) {
+                return redirect()->route('dashboard.ortu');
+            }
+
+            return redirect()->route('dashboard.index');
         }
 
         // 4. Jika gagal (user tidak ditemukan atau password salah)
