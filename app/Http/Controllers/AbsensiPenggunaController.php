@@ -61,10 +61,19 @@ class AbsensiPenggunaController extends Controller
             ->pluck('tanggal')
             ->toArray();
 
-        // Statistik absensi
-        $statistics = $this->calculateStatistics($absensis);
+        // Statistik absensi baru (Hadir, Terlambat)
+        $hadir = 0;
+        $terlambat = 0;
+        foreach ($absensis as $abs) {
+            if ($abs->kategori == 1) {
+                $hadir++;
+                if ($abs->status === 'telat') {
+                    $terlambat++;
+                }
+            }
+        }
 
-        // Tanggal tanpa absen
+        // Tanggal tanpa absen (untuk hitung Alpa)
         $tanpaAbsen = $this->calculateTanpaAbsen(
             $firstDay,
             $lastDay,
@@ -74,16 +83,61 @@ class AbsensiPenggunaController extends Controller
             $liburKhusus
         );
 
+        $alpa = 0;
+        foreach ($tanpaAbsen['masuk'] as $item) {
+            if ($item['keterangan'] === 'Tidak Absen') {
+                $alpa++;
+            }
+        }
+
+        $izinSakit = count($cuti);
+
+        $ringkasan = [
+            'hadir' => $hadir,
+            'terlambat' => $terlambat,
+            'izinSakit' => $izinSakit,
+            'alpa' => $alpa
+        ];
+
+        // Group absensi by date for the view
+        $groupedAbsensi = [];
+        foreach ($absensis as $abs) {
+            if (empty($abs->absen)) continue;
+            $date = Carbon::parse($abs->absen)->format('Y-m-d');
+            
+            if (!isset($groupedAbsensi[$date])) {
+                $groupedAbsensi[$date] = [
+                    'tanggal' => $date,
+                    'masuk' => null,
+                    'pulang' => null,
+                    'status' => 'Hadir', // Default Hadir
+                    'keterangan' => '-'
+                ];
+            }
+            
+            if ($abs->kategori == 1) {
+                $groupedAbsensi[$date]['masuk'] = $abs->display_absen ? Carbon::parse($abs->display_absen)->format('H:i') : null;
+                if ($abs->status === 'telat') {
+                    $groupedAbsensi[$date]['status'] = 'Terlambat';
+                }
+            }
+            
+            if ($abs->kategori == 4) {
+                $groupedAbsensi[$date]['pulang'] = $abs->display_absen ? Carbon::parse($abs->display_absen)->format('H:i') : null;
+            }
+        }
+        
+        // Sort grouped absensi by date desc
+        krsort($groupedAbsensi);
+
         return view('absensi.pengguna', compact(
             'pengguna',
             'absensis',
             'firstDay',
             'lastDay',
             'cabang',
-            'statistics',
-            'tanpaAbsen',
-            'cuti',
-            'liburKhusus'
+            'ringkasan',
+            'groupedAbsensi'
         ));
     }
 

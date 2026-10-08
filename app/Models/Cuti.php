@@ -16,10 +16,18 @@ class Cuti extends Model
     protected $fillable = [
        'nomor_induk',
        'tanggal',
+       'tanggal_mulai',
+       'tanggal_selesai',
+       'kategori',
+       'alasan',
+       'bukti_file',
+       'status_persetujuan'
     ];
 
      protected $casts = [
-        'tanggal' => 'date'
+        'tanggal' => 'date',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date'
     ];
 
     /**

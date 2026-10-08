@@ -14,10 +14,57 @@
             </p>
         </div>
 
+        {{-- Ringkasan Kehadiran Bulanan (4 Metrik Mini Card Sejajar) --}}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            {{-- Card 1: Hadir --}}
+            <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] cursor-default">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                        <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    </div>
+                    <span class="bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Total Hadir</span>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800">{{ $ringkasan['hadir'] }} <span class="text-sm font-semibold text-slate-500">Hari</span></div>
+            </div>
+
+            {{-- Card 2: Terlambat --}}
+            <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] cursor-default">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
+                        <i class="fas fa-clock text-amber-500 text-xl"></i>
+                    </div>
+                    <span class="bg-amber-50 border border-amber-200 text-amber-600 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Terlambat</span>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800">{{ $ringkasan['terlambat'] }} <span class="text-sm font-semibold text-slate-500">Kali</span></div>
+            </div>
+
+            {{-- Card 3: Izin / Sakit --}}
+            <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] cursor-default">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100">
+                        <i class="fas fa-file-medical text-sky-500 text-xl"></i>
+                    </div>
+                    <span class="bg-sky-50 border border-sky-200 text-sky-600 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Izin / Sakit</span>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800">{{ $ringkasan['izinSakit'] }} <span class="text-sm font-semibold text-slate-500">Hari</span></div>
+            </div>
+
+            {{-- Card 4: Alpa --}}
+            <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] cursor-default">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0 border border-rose-100">
+                        <i class="fas fa-times-circle text-rose-500 text-xl"></i>
+                    </div>
+                    <span class="bg-rose-50 border border-rose-200 text-rose-600 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Alpa</span>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800">{{ $ringkasan['alpa'] }} <span class="text-sm font-semibold text-slate-500">Hari</span></div>
+            </div>
+        </div>
+
         {{-- FILTER FORM --}}
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-8">
             <form method="GET" action="{{ route('absensi.pengguna', $pengguna->nomor_induk) }}">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 items-end">
                     {{-- Tanggal Awal --}}
                     <div>
                         <label class="block mb-2 font-semibold text-gray-700">
@@ -36,31 +83,6 @@
                             class="w-full h-12 rounded-lg border border-gray-300 px-4 focus:ring-2 focus:ring-blue-500">
                     </div>
 
-                    {{-- Kategori --}}
-                    <div>
-                        <label class="block mb-2 font-semibold text-gray-700">
-                            Kategori
-                        </label>
-                        <select name="kategori"
-                            class="w-full h-12 rounded-lg border border-gray-300 px-4 focus:ring-2 focus:ring-blue-500">
-                            <option value="0" {{ request('kategori') == '0' ? 'selected' : '' }}>
-                                Semua Kategori
-                            </option>
-                            <option value="1" {{ request('kategori') == '1' ? 'selected' : '' }}>
-                                Masuk
-                            </option>
-                            <option value="2" {{ request('kategori') == '2' ? 'selected' : '' }}>
-                                Mulai Istirahat
-                            </option>
-                            <option value="3" {{ request('kategori') == '3' ? 'selected' : '' }}>
-                                Selesai Istirahat
-                            </option>
-                            <option value="4" {{ request('kategori') == '4' ? 'selected' : '' }}>
-                                Pulang
-                            </option>
-                        </select>
-                    </div>
-
                     {{-- Submit Button --}}
                     <div class="flex items-end">
                         <button type="submit"
@@ -72,69 +94,59 @@
             </form>
         </div>
 
-        {{-- TABLE ABSENSI dengan pagination --}}
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-visible mb-12 p-6">
-            <div class="overflow-x-auto">
-                <table id="absensiTable" class="w-full text-sm border-collapse">
+        {{-- TABLE ABSENSI --}}
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-12 p-4 sm:p-6">
+            <div class="overflow-x-auto w-full -mx-4 sm:mx-0 px-4 sm:px-0">
+                <table id="absensiTable" class="min-w-full text-xs sm:text-sm border-collapse">
                     <thead class="bg-gray-800 text-gray-100">
                         <tr>
-                            <th class="px-6 py-4 border border-gray-700">Absen</th>
-                            <th class="px-6 py-4 border border-gray-700">Batas</th>
-                            <th class="px-6 py-4 border border-gray-700">Selisih</th>
-                            <th class="px-6 py-4 border border-gray-700">Status</th>
-                            <th class="px-6 py-4 border border-gray-700">Cabang</th>
-                            <th class="px-6 py-4 border border-gray-700">Kategori</th>
-                            <th class="px-6 py-4 border border-gray-700">ID Mesin</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap text-center">No</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap">Tanggal</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap text-center">Jam Masuk</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap text-center">Jam Pulang</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap text-center">Status</th>
+                            <th class="px-4 py-3 sm:px-6 sm:py-4 border border-gray-700 whitespace-nowrap">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- @php
-                        $perPage = 10;
-                        $currentPage = request()->get('page', 1);
-                        $total = count($absensis);
-                        $absensisPaginated = collect($absensis)->forPage($currentPage, $perPage);
-                    @endphp
-                     --}}
-                        @forelse($absensis as $absensi)
+                        @php $no = 1; @endphp
+                        @forelse($groupedAbsensi as $item)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 border {{ $absensi->warna }}">
-                                    {{ $absensi->display_absen ?? ($absensi->absen_at ?? '-') }}
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap text-center font-medium">
+                                    {{ $no++ }}
                                 </td>
-                                <td class="px-6 py-4 border">
-                                    {{ $absensi->display_batas ?? '-' }}
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap font-medium text-slate-800">
+                                    {{ \Carbon\Carbon::parse($item['tanggal'])->locale('id')->translatedFormat('l, d M Y') }}
                                 </td>
-                                <td class="px-6 py-4 border {{ $absensi->warna }}">
-                                    {{ $absensi->selisih_menit !== null ? floor($absensi->selisih_menit) . ' Menit' : '-' }}
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap text-center font-bold {{ $item['masuk'] ? 'text-emerald-600' : 'text-slate-400' }}">
+                                    {{ $item['masuk'] ?? '-' }}
                                 </td>
-                                <td class="px-6 py-4 border text-center">
-                                    @if (is_null($absensi->status))
-                                        <span
-                                            class="px-3 py-1 rounded-full bg-gray-200 text-gray-700 font-semibold">-</span>
-                                    @elseif($absensi->warna === 'text-green-600')
-                                        <span class="px-3 py-1 rounded-full bg-green-600 text-white font-semibold">
-                                            {{ $absensi->status_label }}
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap text-center font-bold {{ $item['pulang'] ? 'text-blue-600' : 'text-slate-400' }}">
+                                    {{ $item['pulang'] ?? '-' }}
+                                </td>
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border text-center whitespace-nowrap">
+                                    @if ($item['status'] === 'Hadir')
+                                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[11px] uppercase tracking-wider">
+                                            Hadir
+                                        </span>
+                                    @elseif($item['status'] === 'Terlambat')
+                                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 font-bold text-[11px] uppercase tracking-wider">
+                                            Terlambat
                                         </span>
                                     @else
-                                        <span class="px-3 py-1 rounded-full bg-red-600 text-white font-semibold">
-                                            {{ $absensi->status_label }}
+                                        <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-bold text-[11px] uppercase tracking-wider">
+                                            {{ $item['status'] }}
                                         </span>
                                     @endif
                                 </td>
-
-                                <td class="px-6 py-4 border">
-                                    {{ $cabang->lokasi ?? '-' }}
-                                </td>
-                                <td class="px-6 py-4 border">
-                                    {{ $absensi->kategori_label ?? '-' }}
-                                </td>
-                                <td class="px-6 py-4 border">
-                                    {{ $absensi->idmesin }}
+                                <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap text-slate-600">
+                                    {{ $item['keterangan'] ?? '-' }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-8 text-gray-500">
-                                    Tidak ada data absensi
+                                <td colspan="6" class="text-center py-12 text-gray-500">
+                                    Tidak ada data absensi pada periode ini.
                                 </td>
                             </tr>
                         @endforelse
@@ -143,289 +155,12 @@
             </div>
         </div>
 
-
-        {{-- STATISTICS BOXES - TERLAMBAT/CEPAT --}}
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {{-- Masuk Terlambat --}}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-sign-in-alt text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Masuk</h3>
-                        <p class="text-sm text-gray-600">Total menit terlambat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-red-600">
-                    {{ $statistics['terlambatMasuk'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Mulai Istirahat Cepat --}}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-utensils text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Mulai Istirahat</h3>
-                        <p class="text-sm text-gray-600">Total menit cepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-red-600">
-                    {{ $statistics['cepatIstirahatMulai'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Selesai Istirahat Cepat --}}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-laptop-house text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Selesai Istirahat</h3>
-                        <p class="text-sm text-gray-600">Total menit cepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-red-600">
-                    {{ $statistics['cepatIstirahatSelesai'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Pulang Cepat --}}
-            <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-sign-out-alt text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Pulang</h3>
-                        <p class="text-sm text-gray-600">Total menit cepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-red-600">
-                    {{ $statistics['cepatPulang'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-        </div>
-
-        {{-- STATISTICS BOXES - TEPAT WAKTU --}}
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {{-- Masuk Tepat --}}
-            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fa fa-sign-in-alt text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Masuk</h3>
-                        <p class="text-sm text-gray-600">Total menit tepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-green-600">
-                    {{ $statistics['tepatMasuk'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Mulai Istirahat Tepat --}}
-            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-utensils text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Mulai Istirahat</h3>
-                        <p class="text-sm text-gray-600">Total menit tepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-green-600">
-                    {{ $statistics['tepatIstirahatMulai'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Selesai Istirahat Tepat --}}
-            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-laptop-house text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Selesai Istirahat</h3>
-                        <p class="text-sm text-gray-600">Total menit tepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-green-600">
-                    {{ $statistics['tepatIstirahatSelesai'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-
-            {{-- Pulang Tepat --}}
-            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-                        <i class="fas fa-sign-out-alt text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">Pulang</h3>
-                        <p class="text-sm text-gray-600">Total menit tepat</p>
-                    </div>
-                </div>
-                <p class="text-2xl font-bold text-green-600">
-                    {{ $statistics['tepatPulang'] }} <span class="text-lg">Menit</span>
-                </p>
-            </div>
-        </div>
-
-        {{-- TANPA ABSEN TABLES tanpa scroll --}}
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {{-- Tanpa Absen Masuk --}}
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="font-bold text-gray-800">Tanpa Absen Masuk</h3>
-                </div>
-                <div class="p-4">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left border-b">Tanggal</th>
-                                <th class="px-4 py-3 text-left border-b">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tanpaAbsen['masuk'] as $item)
-                                <tr>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['tanggal'] }}
-                                    </td>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['keterangan'] }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center py-8 text-gray-500 border-b">
-                                        Semua hari tercatat
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Tanpa Absen Mulai Istirahat --}}
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="font-bold text-gray-800">Tanpa Absen Mulai Istirahat</h3>
-                </div>
-                <div class="p-4">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left border-b">Tanggal</th>
-                                <th class="px-4 py-3 text-left border-b">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tanpaAbsen['mulai'] as $item)
-                                <tr>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['tanggal'] }}
-                                    </td>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['keterangan'] }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center py-8 text-gray-500 border-b">
-                                        Semua hari tercatat
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Tanpa Absen Selesai Istirahat --}}
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="font-bold text-gray-800">Tanpa Absen Selesai Istirahat</h3>
-                </div>
-                <div class="p-4">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left border-b">Tanggal</th>
-                                <th class="px-4 py-3 text-left border-b">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tanpaAbsen['selesai'] as $item)
-                                <tr>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['tanggal'] }}
-                                    </td>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['keterangan'] }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center py-8 text-gray-500 border-b">
-                                        Semua hari tercatat
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Tanpa Absen Pulang --}}
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="font-bold text-gray-800">Tanpa Absen Pulang</h3>
-                </div>
-                <div class="p-4">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left border-b">Tanggal</th>
-                                <th class="px-4 py-3 text-left border-b">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tanpaAbsen['pulang'] as $item)
-                                <tr>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['tanggal'] }}
-                                    </td>
-                                    <td class="px-4 py-3 border-b {{ $item['warna'] }}">
-                                        {{ $item['keterangan'] }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center py-8 text-gray-500 border-b">
-                                        Semua hari tercatat
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
     @push('styles')
         <style>
             .dataTables_wrapper {
-                padding: 1rem;
+                padding: 0;
             }
 
             .dataTables_filter,
@@ -442,9 +177,40 @@
                 margin-top: 0.75rem !important;
                 margin-bottom: 0.75rem !important;
             }
+            
+            @media (max-width: 640px) {
+                .dt-buttons {
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 0.5rem;
+                    width: 100%;
+                    justify-content: center;
+                }
+                .dt-buttons .dt-button {
+                    flex: 1 1 auto;
+                    margin: 0 !important;
+                }
+                .dataTables_filter {
+                    width: 100%;
+                    margin-top: 0.5rem;
+                }
+                .dataTables_filter label {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    text-align: left;
+                }
+                .dataTables_filter input {
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    border-radius: 0.5rem;
+                    border: 1px solid #e5e7eb;
+                }
+            }
         </style>
     @endpush
-
 
     @push('scripts')
 <script>
@@ -452,22 +218,16 @@ $(document).ready(function() {
     $('#absensiTable').DataTable({
         responsive: true,
         pageLength: 10,
-        order: [[0, 'desc']],
+        order: [], // Disable initial sort so it respects the backend grouped order
         lengthChange: false,
 
-        dom: "<'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4'Bf>" +
-             "<'overflow-x-auto't>" +
+        dom: "<'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4'Bf>" +
+             "<'overflow-x-auto w-full -mx-4 sm:mx-0 px-4 sm:px-0't>" +
              "<'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4'ip>",
 
         buttons: [
-            { extend: 'copy', title: 'Rekap Absen' },
             { extend: 'excel', title: 'Rekap Absen' },
-            { extend: 'pdf', title: 'Rekap Absen' },
-            { extend: 'print', title: 'Rekap Absen' },
-            {
-                extend: 'colvis',
-                text: 'Column visibility'
-            }
+            { extend: 'pdf', title: 'Rekap Absen' }
         ],
 
         language: {

@@ -44,6 +44,16 @@ Route::middleware(['auth', 'hakAkses:nusabot,full,general'])->group(function () 
 */
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/absensi/pengguna', [AbsensiPenggunaController::class, 'rekapSaya'])->name('absensi.pengguna.saya');
+    
+    // Fitur web presensi & izin siswa
+    Route::post('/presensi/siswa', [AbsensiController::class, 'storeSiswa'])->name('presensi-siswa.store');
+    
+    Route::get('/izin/siswa', [CutiController::class, 'izinSiswaIndex'])->name('siswa.izin.index');
+    Route::get('/izin/siswa/create', [CutiController::class, 'izinSiswaCreate'])->name('siswa.izin.create');
+    Route::post('/izin/siswa/store', [CutiController::class, 'izinSiswaStore'])->name('siswa.izin.store');
+    
+    Route::get('/absensi/rekap/pdf', [App\Http\Controllers\RekapSiswaController::class, 'exportPdf'])->name('siswa.rekap.pdf');
+    Route::get('/absensi/rekap/excel', [App\Http\Controllers\RekapSiswaController::class, 'exportExcel'])->name('siswa.rekap.excel');
 });
 
 /*
@@ -58,7 +68,7 @@ Route::middleware('hakAkses:nusabot,full')->group(function () {
         Route::get('/', [AbsensiController::class, 'index'])->name('index');
         Route::post('/', [AbsensiController::class, 'store'])->name('store');
         Route::get('/mesin', [AbsensiController::class, 'byMesin'])->name('mesin');
-        Route::get('/pengguna/{nomor_induk}', [AbsensiPenggunaController::class, 'rekap'])->name('pengguna');
+        Route::get('/pengguna/{nomor_induk}', [AbsensiPenggunaController::class, 'show'])->name('pengguna');
         Route::get('/{id}', [AbsensiController::class, 'show'])->name('show');
     });
 
