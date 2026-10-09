@@ -36,7 +36,7 @@
         <nav class="px-2 space-y-1.5 mt-2">
             @if($userHakAkses === 'orang_tua')
                 <!-- Dashboard Orang Tua -->
-                <a href="{{ route('dashboard.ortu') }}" 
+                <a href="{{ route('dashboard.ortu') }}"
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('dashboard-ortu*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                    title="Dashboard">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -44,7 +44,7 @@
                 </a>
             @else
             <!-- 1. Dashboard -->
-            <a href="{{ url('pages/dashboard') }}" 
+            <a href="{{ url('pages/dashboard') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/dashboard*') || request()->is('dashboard*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Dashboard">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -52,7 +52,7 @@
             </a>
 
             <!-- 2. Pengguna -->
-            <a href="{{ url('pages/pengguna') }}" 
+            <a href="{{ url('pages/pengguna') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/pengguna*') || request()->is('pengguna*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Pengguna">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -60,7 +60,7 @@
             </a>
 
             <!-- 3. Absensi -->
-            <a href="{{ url('pages/absensi') }}" 
+            <a href="{{ url('pages/absensi') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/absensi*') || request()->is('absensi*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Absensi">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
@@ -68,7 +68,7 @@
             </a>
 
             <!-- 4. Cuti -->
-            <a href="{{ url('pages/cuti') }}" 
+            <a href="{{ url('pages/cuti') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/cuti*') || request()->is('cuti*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Cuti">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -76,7 +76,7 @@
             </a>
 
             <!-- 5. Tanggal Libur Khusus -->
-            <a href="{{ url('pages/libur') }}" 
+            <a href="{{ url('pages/libur') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/libur*') || request()->is('libur*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Tanggal Libur Khusus">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 002.5-2.5V11a2 2 0 012-2h1.055"/></svg>
@@ -84,7 +84,7 @@
             </a>
 
             <!-- 6. Mesin Absensi -->
-            <a href="{{ url('pages/mesin/mesin_absensi.php') }}" 
+            <a href="{{ url('pages/mesin/mesin_absensi.php') }}"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->is('pages/mesin*') || request()->is('mesin*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 font-semibold' : 'hover:bg-slate-800/70 hover:text-white' }}"
                title="Mesin Absensi">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
@@ -93,8 +93,8 @@
 
             <!-- 7. Dropdown Pengaturan -->
             <div x-data="{ open: {{ request()->is('pages/jabatan*') || request()->is('pages/cabang*') || request()->is('pages/denda*') || request()->is('pages/sistem*') || request()->is('jabatan*') || request()->is('cabang*') || request()->is('denda*') || request()->is('sistem*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" 
-                        type="button" 
+                <button @click="open = !open"
+                        type="button"
                         class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-800/70 hover:text-white cursor-pointer"
                         title="Pengaturan">
                     <div class="flex items-center gap-3">
@@ -105,26 +105,26 @@
                 </button>
 
                 <!-- Submenu Items -->
-                <div x-show="open" 
-                     x-collapse 
+                <div x-show="open"
+                     x-collapse
                      class="pl-9 pr-2 py-1 space-y-1 sidebar-text">
-                    
-                    <a href="{{ url('pages/jabatan') }}" 
+
+                    <a href="{{ url('pages/jabatan') }}"
                        class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->is('pages/jabatan*') || request()->is('jabatan*') ? 'text-blue-400 font-semibold bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
                        • Jabatan / Status
                     </a>
 
-                    <a href="{{ url('pages/cabang') }}" 
+                    <a href="{{ url('pages/cabang') }}"
                        class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->is('pages/cabang*') || request()->is('cabang*') ? 'text-blue-400 font-semibold bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
                        • Cabang / Gedung
                     </a>
 
-                    <a href="{{ url('pages/denda') }}" 
+                    <a href="{{ url('pages/denda') }}"
                        class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->is('pages/denda*') || request()->is('denda*') ? 'text-blue-400 font-semibold bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
                        • Denda
                     </a>
 
-                    <a href="{{ url('pages/sistem') }}" 
+                    <a href="{{ url('pages/sistem') }}"
                        class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->is('pages/sistem*') || request()->is('sistem*') ? 'text-blue-400 font-semibold bg-slate-800/50' : 'text-slate-400 hover:text-white hover:bg-slate-800/30' }}">
                        • Sistem
                     </a>
@@ -139,7 +139,7 @@
     <div class="p-3 border-t border-slate-800/80">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" 
+            <button type="submit"
                     class="w-full flex items-center justify-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white text-sm font-semibold transition-all duration-200 cursor-pointer"
                     title="Logout">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>

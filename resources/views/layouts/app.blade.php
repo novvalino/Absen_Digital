@@ -48,6 +48,15 @@
     $isAdmin = in_array($userRole, ['orang tua', 'full']);
     $isGeneral = $userRole === 'general';
 
+    $cutiPending = 0;
+    if ($isAdmin) {
+        try {
+            $cutiPending = \App\Models\Cuti::pending()->count();
+        } catch (\Throwable $e) {
+            // kolom status_persetujuan belum ada (migrasi belum dijalankan)
+        }
+    }
+
     $namaUser = $user?->nama ?? ($user?->name ?? 'User');
     $inisial = strtoupper(mb_substr($namaUser, 0, 2));
 
@@ -58,7 +67,7 @@
     $menuAdmin = [
         ['url' => url('pengguna'), 'icon' => 'bi-people-fill', 'label' => 'Pengguna', 'active' => request()->is('pengguna*')],
         ['url' => url('absensi'), 'icon' => 'bi-card-checklist', 'label' => 'Absensi', 'active' => request()->is('absensi*') && !request()->is('absensi/pengguna*')],
-        ['url' => url('cuti'), 'icon' => 'bi-calendar-event-fill', 'label' => 'Cuti', 'active' => request()->is('cuti*')],
+        ['url' => url('cuti'), 'icon' => 'bi-calendar-event-fill', 'label' => 'Cuti', 'active' => request()->is('cuti*'), 'badge' => $cutiPending],
         ['url' => url('libur_khusus'), 'icon' => 'bi-calendar2-heart-fill', 'label' => 'Tanggal Libur', 'active' => request()->is('libur_khusus*')],
         ['url' => url('mesin'), 'icon' => 'bi-cpu-fill', 'label' => 'Mesin', 'active' => request()->is('mesin*')],
     ];
@@ -114,6 +123,9 @@
                             @foreach ($menuAdmin as $m)
                                 <a href="{{ $m['url'] }}" title="{{ $m['label'] }}" class="nav-item {{ $m['active'] ? 'active' : '' }}">
                                     <i class="bi {{ $m['icon'] }}"></i><span class="sidebar-text truncate">{{ $m['label'] }}</span>
+                                    @if (!empty($m['badge']))
+                                        <span class="sidebar-text" style="margin-left:auto;background:#f59e0b;color:#fff;border-radius:999px;font-size:.65rem;font-weight:700;padding:.1rem .45rem">{{ $m['badge'] }}</span>
+                                    @endif
                                 </a>
                             @endforeach
 

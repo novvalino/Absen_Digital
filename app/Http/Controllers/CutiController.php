@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cuti;
 use App\Models\Pengguna;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,12 +16,12 @@ class CutiController extends Controller
      */
     public function index(Request $request)
     {
-        // Query cuti dengan pagination
-        $query = Cuti::with('pengguna')
+        $query = Cuti::with(['pengguna', 'penyetuju'])
+            ->orderByRaw("CASE WHEN status_persetujuan = 'Pending' THEN 0 ELSE 1 END")
             ->orderBy('tanggal', 'desc');
 
         // Filter berdasarkan tanggal jika ada
-        if ($request->has('start_date') && $request->has('end_date')) {
+        if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('tanggal', [
                 $request->start_date,
                 $request->end_date
@@ -28,18 +29,34 @@ class CutiController extends Controller
         }
 
         // Filter berdasarkan nomor induk
-        if ($request->has('nomor_induk')) {
+        if ($request->filled('nomor_induk')) {
             $query->where('nomor_induk', $request->nomor_induk);
         }
 
-        $cuti = $query->paginate(20);
-        
+        // Filter berdasarkan status persetujuan
+        $status = $request->get('status');
+        if (in_array($status, [Cuti::PENDING, Cuti::DISETUJUI, Cuti::DITOLAK], true)) {
+            $query->where('status_persetujuan', $status);
+        } else {
+            $status = null;
+        }
+
+        // DataTable di view yang mengurus paging, jadi semua baris dikirim
+        $cuti = $query->get();
+
+        $jumlah = [
+            'semua'     => Cuti::count(),
+            'pending'   => Cuti::pending()->count(),
+            'disetujui' => Cuti::disetujui()->count(),
+            'ditolak'   => Cuti::where('status_persetujuan', Cuti::DITOLAK)->count(),
+        ];
+
         // Ambil semua pengguna aktif untuk dropdown
         $penggunaList = Pengguna::where('aktif', '1')
             ->orderBy('nama')
             ->get();
-        
-        return view('cuti.index', compact('cuti', 'penggunaList'));
+
+        return view('cuti.index', compact('cuti', 'penggunaList', 'jumlah', 'status'));
     }
 
     /**
@@ -94,9 +111,16 @@ class CutiController extends Controller
         try {
             DB::beginTransaction();
             
+            // Cuti yang diinput langsung oleh admin otomatis Disetujui
             $cuti = Cuti::create([
-                'nomor_induk' => $request->nomor_induk,
-                'tanggal' => $request->tanggal
+                'nomor_induk'        => $request->nomor_induk,
+                'tanggal'            => $request->tanggal,
+                'tanggal_mulai'      => $request->tanggal,
+                'tanggal_selesai'    => $request->tanggal,
+                'kategori'           => 'Cuti',
+                'status_persetujuan' => Cuti::DISETUJUI,
+                'disetujui_oleh'     => auth()->user()?->nomor_induk,
+                'tanggal_keputusan'  => now(),
             ]);
 
             // Ambil nama pengguna untuk pesan sukses
@@ -170,10 +194,18 @@ public function update(Request $request, string $id)
     try {
         DB::beginTransaction();
         
-        $cuti->update([
+        $data = [
             'nomor_induk' => $request->nomor_induk,
             'tanggal' => $request->tanggal
-        ]);
+        ];
+
+        // Cuti buatan admin (bukan pengajuan siswa): rentang ikut tanggal baru
+        if (empty($cuti->kategori) || $cuti->kategori === 'Cuti') {
+            $data['tanggal_mulai'] = $request->tanggal;
+            $data['tanggal_selesai'] = $request->tanggal;
+        }
+
+        $cuti->update($data);
 
         // Ambil nama pengguna baru untuk pesan sukses
         $namaPenggunaBaru = Pengguna::where('nomor_induk', $request->nomor_induk)
@@ -235,14 +267,83 @@ public function update(Request $request, string $id)
             'tanggal' => 'required|date'
         ]);
 
-        $cuti = Cuti::where('nomor_induk', $request->nomor_induk)
-            ->where('tanggal', $request->tanggal)
-            ->exists();
+        $cuti = in_array(
+            Carbon::parse($request->tanggal)->format('Y-m-d'),
+            Cuti::tanggalDisetujui($request->nomor_induk, $request->tanggal, $request->tanggal),
+            true
+        );
 
         return response()->json([
             'is_cuti' => $cuti,
             'message' => $cuti ? 'Karyawan sedang cuti' : 'Karyawan tidak cuti'
         ]);
+    }
+
+    // ============================================
+    // PERSETUJUAN PENGAJUAN SISWA (ADMIN)
+    // ============================================
+
+    /**
+     * Pastikan yang memproses adalah admin (nusabot / full).
+     * Dicek di sini juga supaya aksi persetujuan tidak bergantung pada middleware saja.
+     */
+    private function pastikanAdmin()
+    {
+        $user = auth()->user();
+        $hak = $user?->jabatanStatus?->hakAkses?->hak;
+
+        abort_unless($user && in_array($hak, ['nusabot', 'full'], true), 403, 'Hanya admin yang dapat memproses pengajuan.');
+
+        return $user;
+    }
+
+    public function setujui(Request $request, string $id)
+    {
+        $admin = $this->pastikanAdmin();
+        $cuti = Cuti::with('pengguna')->findOrFail($id);
+
+        $cuti->update([
+            'status_persetujuan' => Cuti::DISETUJUI,
+            'disetujui_oleh'     => $admin->nomor_induk,
+            'tanggal_keputusan'  => now(),
+            'catatan_admin'      => null,
+        ]);
+
+        $nama = $cuti->pengguna->nama ?? $cuti->nomor_induk;
+
+        return redirect()->route('cuti.index', $request->only('status'))
+            ->with('success', "Pengajuan <b>{$nama}</b> telah disetujui.");
+    }
+
+    public function tolak(Request $request, string $id)
+    {
+        $admin = $this->pastikanAdmin();
+
+        $validator = Validator::make($request->all(), [
+            'catatan_admin' => 'required|string|max:500',
+        ], [
+            'catatan_admin.required' => 'Alasan penolakan wajib diisi.',
+            'catatan_admin.max'      => 'Alasan penolakan maksimal 500 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('cuti.index', $request->only('status'))
+                ->with('error', $validator->errors()->first());
+        }
+
+        $cuti = Cuti::with('pengguna')->findOrFail($id);
+
+        $cuti->update([
+            'status_persetujuan' => Cuti::DITOLAK,
+            'disetujui_oleh'     => $admin->nomor_induk,
+            'tanggal_keputusan'  => now(),
+            'catatan_admin'      => $request->catatan_admin,
+        ]);
+
+        $nama = $cuti->pengguna->nama ?? $cuti->nomor_induk;
+
+        return redirect()->route('cuti.index', $request->only('status'))
+            ->with('warning', "Pengajuan <b>{$nama}</b> telah ditolak.");
     }
 
     // ============================================
@@ -291,6 +392,19 @@ public function update(Request $request, string $id)
 
         $user = auth()->user();
 
+        // Cegah pengajuan yang bertabrakan dengan pengajuan lain yang masih aktif
+        $bentrok = Cuti::byNomorInduk($user->nomor_induk)
+            ->where('status_persetujuan', '!=', Cuti::DITOLAK)
+            ->whereDate('tanggal_mulai', '<=', $request->tanggal_selesai)
+            ->whereDate('tanggal_selesai', '>=', $request->tanggal_mulai)
+            ->exists();
+
+        if ($bentrok) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Sudah ada pengajuan izin/sakit pada rentang tanggal tersebut.');
+        }
+
         // Handle File Upload
         $path = null;
         if ($request->hasFile('bukti_file')) {
@@ -306,7 +420,7 @@ public function update(Request $request, string $id)
             'kategori' => $request->kategori,
             'alasan' => $request->alasan,
             'bukti_file' => $path,
-            'status_persetujuan' => 'Pending'
+            'status_persetujuan' => Cuti::PENDING
         ]);
 
         return redirect()->route('siswa.izin.index')
