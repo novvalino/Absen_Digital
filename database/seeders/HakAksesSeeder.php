@@ -15,6 +15,7 @@ class HakAksesSeeder extends Seeder
             1 => 'nusabot',
             2 => 'full',
             3 => 'general',
+            4 => 'orang_tua',
         ];
 
         foreach ($hakAksesList as $id => $hak) {

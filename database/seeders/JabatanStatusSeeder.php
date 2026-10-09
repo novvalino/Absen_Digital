@@ -32,6 +32,12 @@ class JabatanStatusSeeder extends Seeder
                 'hak_akses' => 3, // id hak_akses "general"
                 'aktif' => 1,
             ],
+            [
+                'id' => 4,
+                'jabatan_status' => 'Orang Tua',
+                'hak_akses' => 4, // id hak_akses "orang_tua"
+                'aktif' => 1,
+            ],
         ];
 
         foreach ($jabatanStatuses as $status) {

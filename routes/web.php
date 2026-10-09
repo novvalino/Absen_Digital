@@ -27,7 +27,7 @@ Route::match(['get', 'post'], '/absensi-machine', [AbsensiController::class, 'st
 | Authenticated User Routes (Semua Role)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'hakAkses:nusabot,full,general'])->group(function () {
+Route::middleware(['auth', 'hakAkses:orang tua,full,general'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -35,6 +35,18 @@ Route::middleware(['auth', 'hakAkses:nusabot,full,general'])->group(function () 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Libur Khusus (Bisa diakses semua role untuk melihat jadwal libur)
+    Route::get('/libur_khusus', [LiburKhususController::class, 'index'])->name('libur_khusus.index');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Orang Tua Routes (Role Orang Tua)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'hakAkses:orang_tua'])->group(function () {
+    Route::get('/dashboard-ortu', [DashboardController::class, 'ortu'])->name('dashboard.ortu');
 });
 
 /*
@@ -58,10 +70,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (Role: Nusabot & Full)
+| Admin Routes (Role: Orang Tua & Full)
 |--------------------------------------------------------------------------
 */
-Route::middleware('hakAkses:nusabot,full')->group(function () {
+Route::middleware('hakAkses:orang tua,full')->group(function () {
 
     // Absensi Admin
     Route::prefix('absensi')->name('absensi.')->group(function () {
@@ -113,7 +125,6 @@ Route::middleware('hakAkses:nusabot,full')->group(function () {
 
     // Libur Khusus
     Route::prefix('libur_khusus')->name('libur_khusus.')->group(function () {
-        Route::get('/', [LiburKhususController::class, 'index'])->name('index');
         Route::post('/', [LiburKhususController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [LiburKhususController::class, 'edit'])->name('edit');
         Route::put('/{id}', [LiburKhususController::class, 'update'])->name('update');

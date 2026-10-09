@@ -87,4 +87,26 @@ class User extends Authenticatable
     //         'password' => 'hashed',
     //     ];
     // }
+
+    // 🔹 Relasi Orang Tua ke Siswa (Anak)
+    public function anak()
+    {
+        return $this->belongsToMany(
+            User::class, 
+            'orang_tua_siswa', 
+            'orang_tua_id', 
+            'siswa_id'
+        );
+    }
+
+    // 🔹 Relasi Siswa ke Orang Tua
+    public function orangTua()
+    {
+        return $this->belongsToMany(
+            User::class, 
+            'orang_tua_siswa', 
+            'siswa_id', 
+            'orang_tua_id'
+        );
+    }
 }

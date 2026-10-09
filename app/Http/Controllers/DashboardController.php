@@ -25,10 +25,11 @@ class DashboardController extends Controller
         /**
          * ===============================
          * ADMIN / PIMPINAN
-         * hak_akses: 0, 1
          * ===============================
          */
-        if (in_array($hakAkses, [0, 1]) || $user->tag === 'admin') {
+        // hak_akses 2 adalah 'Full' (Admin), sementara hak_akses 1 adalah 'Nusabot' (Siswa/User)
+        // Kita sesuaikan logikanya di sini agar Admin memuat view dashboard.index
+        if (in_array($hakAkses, [2]) || str_contains(strtolower($user->tag), 'admin')) {
 
             $cabangGedungId = $request->get('cabangGedung');
 
@@ -54,7 +55,9 @@ class DashboardController extends Controller
                 'terlambat'       => $stats['telat'],
                 'lokasiCabang'    => $lokasiCabang,
                 'cabangGedungId'  => $cabangGedungId ?? null,
-                'hakAkses'        => $hakAkses
+                // Passing nilai 1 agar Filter Cabang di view dashboard.index tetap muncul
+                // (karena di view ada pengecekan if (in_array($hakAkses, [0, 1])))
+                'hakAkses'        => 1
             ]);
         }
         /**
@@ -129,6 +132,16 @@ class DashboardController extends Controller
                 // But if they just mean based on kategori string, we handle it if needed.
             }
 
+            if ($hakAkses == 1) { // Orang Tua
+                return view('dashboard.orangtua', [
+                    'totalHariMasuk' => $totalHariMasuk,
+                    'totalHariEfektif' => $totalHariEfektif,
+                    'persentaseKehadiran' => $persentaseKehadiran,
+                    'riwayatTerbaru' => $riwayatTerbaru,
+                    'hakAkses' => $hakAkses
+                ]);
+            }
+
             return view('dashboard.siswa', [
                 'totalHariMasuk' => $totalHariMasuk,
                 'totalHariEfektif' => $totalHariEfektif,
@@ -196,5 +209,66 @@ class DashboardController extends Controller
             'tepat'  => $dataTepat,
             'telat'  => $dataTelat,
         ];
+    }
+
+    /**
+     * =====================================
+     * DASHBOARD KHUSUS ORANG TUA
+     * =====================================
+     */
+    public function ortu(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Ambil data anak beserta absensi mereka untuk hari ini
+        $anakAnak = $user->anak()->get();
+        $today = Carbon::today();
+
+        // Siapkan data riwayat (gabungan semua anak)
+        $riwayatAbsensi = collect();
+
+        foreach ($anakAnak as $anak) {
+            // Ambil absensi masuk (kategori 1) hari ini
+            $absenHariIni = DB::table('absensi')
+                ->where('nomor_induk', $anak->nomor_induk)
+                ->where('kategori', 1)
+                ->whereDate('absen', $today)
+                ->first();
+
+            $anak->absen_hari_ini = $absenHariIni;
+
+            if ($absenHariIni && $absenHariIni->absen) {
+                // Tentukan status (Tepat/Telat)
+                $waktuAbsen = Carbon::parse($absenHariIni->absen);
+                $jamMasuk = Carbon::parse($today->toDateString() . ' 08:00:00');
+                $anak->jam_masuk = $waktuAbsen->format('H:i');
+                $anak->status_absen = $waktuAbsen->lte($jamMasuk) ? 'Tepat Waktu' : 'Terlambat';
+            } else {
+                $anak->jam_masuk = '-';
+                $anak->status_absen = 'Belum Absen';
+            }
+
+            // Ambil riwayat absensi 5 terakhir untuk anak ini
+            $riwayat = DB::table('absensi')
+                ->where('nomor_induk', $anak->nomor_induk)
+                ->orderBy('absen', 'desc')
+                ->limit(5)
+                ->get()
+                ->map(function ($item) use ($anak) {
+                    $item->nama_anak = $anak->nama;
+                    return $item;
+                });
+            
+            $riwayatAbsensi = $riwayatAbsensi->concat($riwayat);
+        }
+
+        // Urutkan riwayat absensi gabungan dari yang terbaru
+        $riwayatAbsensi = $riwayatAbsensi->sortByDesc('absen')->take(10);
+
+        return view('dashboard.ortu', [
+            'user' => $user,
+            'anakAnak' => $anakAnak,
+            'riwayatAbsensi' => $riwayatAbsensi
+        ]);
     }
 }
