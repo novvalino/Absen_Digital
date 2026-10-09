@@ -25,10 +25,11 @@ class DashboardController extends Controller
         /**
          * ===============================
          * ADMIN / PIMPINAN
-         * hak_akses: 0, 1
          * ===============================
          */
-        if (in_array($hakAkses, [0, 1]) || $user->tag === 'admin') {
+        // hak_akses 2 adalah 'Full' (Admin), sementara hak_akses 1 adalah 'Nusabot' (Siswa/User)
+        // Kita sesuaikan logikanya di sini agar Admin memuat view dashboard.index
+        if (in_array($hakAkses, [2]) || str_contains(strtolower($user->tag), 'admin')) {
 
             $cabangGedungId = $request->get('cabangGedung');
 
@@ -54,7 +55,9 @@ class DashboardController extends Controller
                 'terlambat'       => $stats['telat'],
                 'lokasiCabang'    => $lokasiCabang,
                 'cabangGedungId'  => $cabangGedungId ?? null,
-                'hakAkses'        => $hakAkses
+                // Passing nilai 1 agar Filter Cabang di view dashboard.index tetap muncul
+                // (karena di view ada pengecekan if (in_array($hakAkses, [0, 1])))
+                'hakAkses'        => 1
             ]);
         }
         /**
@@ -127,6 +130,16 @@ class DashboardController extends Controller
                 
                 // Check if it's Izin / Sakit logic? Cuti table handles Izin/Sakit. 
                 // But if they just mean based on kategori string, we handle it if needed.
+            }
+
+            if ($hakAkses == 1) { // Orang Tua
+                return view('dashboard.orangtua', [
+                    'totalHariMasuk' => $totalHariMasuk,
+                    'totalHariEfektif' => $totalHariEfektif,
+                    'persentaseKehadiran' => $persentaseKehadiran,
+                    'riwayatTerbaru' => $riwayatTerbaru,
+                    'hakAkses' => $hakAkses
+                ]);
             }
 
             return view('dashboard.siswa', [

@@ -290,6 +290,9 @@ class AbsensiPenggunaController extends Controller
     {
         $start = Carbon::parse($firstDay);
         $end = Carbon::parse($lastDay);
+        $today = Carbon::today();
+        $now = Carbon::now();
+        $jamPulang = $this->defaultJam['4'] ?? '17:00:00';
 
         $tanpaAbsen = ['masuk'=>[], 'mulai'=>[], 'selesai'=>[], 'pulang'=>[]];
 
@@ -304,20 +307,40 @@ class AbsensiPenggunaController extends Controller
         while ($start <= $end) {
             $currentDate = $start->format('Y-m-d');
             $dayOfWeek = $start->dayOfWeek;
+            
+            // Perbaikan 1: Pengecualian Sabtu dan Minggu menggunakan isWeekend()
+            $isWeekend = $start->isWeekend();
 
-            if (!in_array($dayOfWeek, $hariLiburInt)) {
+            // Perbaikan 2 & 3: Jangan hitung hari ini jika belum lewat jam pulang
+            $isFuture = $start->gt($today);
+            $isTodayNotPassed = $start->equalTo($today) && $now->format('H:i:s') < $jamPulang;
+            $isBelumLewat = $isFuture || $isTodayNotPassed;
+
+            if (!$isWeekend && !in_array($dayOfWeek, $hariLiburInt)) {
                 $isCuti = in_array($currentDate, $cuti);
                 $isLiburKhusus = in_array($currentDate, $liburKhusus);
 
-                $keterangan = $isCuti ? 'Cuti' : ($isLiburKhusus ? 'Libur' : 'Tidak Absen');
-                $warna = ($isCuti || $isLiburKhusus) ? 'text-green-600' : 'text-red-600';
+                if ($isCuti) {
+                    $keterangan = 'Cuti';
+                    $warna = 'text-green-600';
+                } elseif ($isLiburKhusus) {
+                    $keterangan = 'Libur';
+                    $warna = 'text-green-600';
+                } elseif ($isBelumLewat) {
+                    $keterangan = 'Belum Lewat';
+                    $warna = 'text-gray-500';
+                } else {
+                    $keterangan = 'Tidak Absen';
+                    $warna = 'text-red-600';
+                }
 
                 foreach (['1'=>'masuk','2'=>'mulai','3'=>'selesai','4'=>'pulang'] as $k=>$label) {
                     if ($keterangan === 'Tidak Absen' && in_array($currentDate, $absensiByKategori[$k])) continue;
+                    // Skip 'Belum Lewat' jika tidak perlu dimasukkan, tapi bisa disertakan supaya UI tetap rapi
                     $tanpaAbsen[$label][] = ['tanggal'=>$currentDate,'keterangan'=>$keterangan,'warna'=>$warna];
                 }
             } else {
-                // Hari libur
+                // Hari libur (Weekend atau Libur khusus dari admin)
                 foreach (['masuk','mulai','selesai','pulang'] as $label) {
                     $tanpaAbsen[$label][] = ['tanggal'=>$currentDate,'keterangan'=>'Libur','warna'=>'text-green-600'];
                 }
