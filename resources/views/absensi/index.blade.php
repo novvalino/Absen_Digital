@@ -67,7 +67,7 @@ table.dataTable {
                 </thead>
 
                 <tbody>
-                    @forelse($absensis as $a)
+                    @foreach($absensis as $a)
                         <tr class="hover:bg-blue-50 transition text-gray-800">
                             <td class="px-4 py-3 border whitespace-nowrap">
                                 {{ $a->display_absen ?? ($a->absen_at ?? '-') }}
@@ -115,29 +115,11 @@ table.dataTable {
                                     @endif
                                 </td>
 
-
-                                {{-- <td class="px-4 py-3 border text-center">
-                                    @if($a->status === 'tepat')
-                                    <span class="bg-green-600 text-white px-3 py-1 rounded-full">Tepat</span>
-                                @elseif($a->status === 'telat')
-                                    <span class="bg-red-600 text-white px-3 py-1 rounded-full">Telat</span>
-                                @else
-                                    <span class="bg-gray-200 px-3 py-1 rounded-full">-</span>
-                                @endif
-                            </td> --}}
-
                             <td class="px-4 py-3 border">
                                 {{ $a->idmesin }}
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-10 text-gray-500">
-                                <i class="bi bi-inbox text-3xl block mb-2"></i>
-                                Data tidak ditemukan
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
 
             </table>

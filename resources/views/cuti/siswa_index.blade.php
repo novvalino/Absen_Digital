@@ -88,6 +88,11 @@
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold uppercase tracking-wider">
                                     <i class="bi bi-x-circle-fill"></i> Ditolak
                                 </span>
+                                @if(!empty($item->catatan_admin))
+                                    <p class="mt-1.5 mb-0 text-xs text-slate-500 whitespace-normal max-w-[220px] mx-auto">
+                                        Alasan admin: {{ $item->catatan_admin }}
+                                    </p>
+                                @endif
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg text-xs font-bold uppercase tracking-wider">
                                     <i class="bi bi-clock-fill"></i> Menunggu

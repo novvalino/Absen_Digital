@@ -51,10 +51,8 @@ class AbsensiPenggunaController extends Controller
         $hariLibur = $this->getHariLibur($cabang);
 
         // Ambil cuti
-        $cuti = Cuti::where('nomor_induk', $nomor_induk)
-            ->whereBetween('tanggal', [$firstDay, $lastDay])
-            ->pluck('tanggal')
-            ->toArray();
+        // Hanya izin/sakit/cuti yang sudah disetujui admin, rentang dijabarkan per hari
+        $cuti = Cuti::tanggalDisetujui($nomor_induk, $firstDay, $lastDay);
 
         // Ambil libur khusus
         $liburKhusus = LiburKhusus::whereBetween('tanggal', [$firstDay, $lastDay])
@@ -90,7 +88,8 @@ class AbsensiPenggunaController extends Controller
             }
         }
 
-        $izinSakit = count($cuti);
+        // Hitung hanya hari kerja yang tertandai Cuti (akhir pekan/libur tidak ikut terhitung)
+        $izinSakit = collect($tanpaAbsen['masuk'])->where('keterangan', 'Cuti')->count();
 
         $ringkasan = [
             'hadir' => $hadir,

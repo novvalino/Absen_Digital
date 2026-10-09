@@ -110,7 +110,8 @@
                     </thead>
                     <tbody>
                         @php $no = 1; @endphp
-                        @forelse($groupedAbsensi as $item)
+                        {{-- DIUBAH MENJADI @foreach --}}
+                        @foreach($groupedAbsensi as $item)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3 sm:px-6 sm:py-4 border whitespace-nowrap text-center font-medium">
                                     {{ $no++ }}
@@ -143,13 +144,7 @@
                                     {{ $item['keterangan'] ?? '-' }}
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-12 text-gray-500">
-                                    Tidak ada data absensi pada periode ini.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -177,7 +172,7 @@
                 margin-top: 0.75rem !important;
                 margin-bottom: 0.75rem !important;
             }
-            
+
             @media (max-width: 640px) {
                 .dt-buttons {
                     display: flex !important;

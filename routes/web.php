@@ -111,6 +111,10 @@ Route::middleware('hakAkses:orang tua,full')->group(function () {
         Route::get('/{id}/edit', [CutiController::class, 'edit'])->name('edit');
         Route::put('/{id}', [CutiController::class, 'update'])->name('update');
         Route::delete('/{id}', [CutiController::class, 'destroy'])->name('destroy');
+
+        // Persetujuan pengajuan izin/sakit dari siswa
+        Route::post('/{id}/setujui', [CutiController::class, 'setujui'])->name('setujui');
+        Route::post('/{id}/tolak', [CutiController::class, 'tolak'])->name('tolak');
     });
 
     // Cabang dan Gedung
