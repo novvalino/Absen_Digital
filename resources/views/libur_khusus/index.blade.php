@@ -17,11 +17,13 @@
                 </div>
             </div>
 
+            @if(in_array(auth()->user()->jabatanStatus?->hakAkses?->hak, ['orang tua', 'full']))
             <button type="button" id="btnTambah"
                 class="js-open-tambah inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-sm cursor-pointer border-0"
                 style="background:linear-gradient(135deg,#4f46e5,#7c3aed);box-shadow:0 10px 20px -8px rgba(79,70,229,.65)">
                 <i class="bi bi-plus-lg"></i> Tambah Libur
             </button>
+            @endif
         </div>
 
         {{-- ================= ALERT ================= --}}
@@ -57,7 +59,9 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Keterangan</th>
+                        @if(in_array(auth()->user()->jabatanStatus?->hakAkses?->hak, ['orang tua', 'full']))
                         <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +75,7 @@
                                 </span>
                             </td>
                             <td>{{ $row->keterangan ?: '-' }}</td>
+                            @if(in_array(auth()->user()->jabatanStatus?->hakAkses?->hak, ['orang tua', 'full']))
                             <td class="text-center">
                                 <div class="flex justify-center gap-2">
 
@@ -98,6 +103,7 @@
 
                                 </div>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
@@ -105,8 +111,10 @@
         </div>
 
         {{-- MODAL TAMBAH & EDIT (file terpisah) --}}
+        @if(in_array(auth()->user()->jabatanStatus?->hakAkses?->hak, ['orang tua', 'full']))
         @include('libur_khusus.create')
         @include('libur_khusus.edit')
+        @endif
 
     </div>
 @endsection
@@ -115,20 +123,19 @@
 @push('scripts')
     <script>
         $(function() {
+            var isAdmin = {{ in_array(auth()->user()->jabatanStatus?->hakAkses?->hak, ['orang tua', 'full']) ? 'true' : 'false' }};
+            var colDefs = [];
+            if (isAdmin) {
+                colDefs.push({ targets: 2, orderable: false });
+            }
+
             $('#datatableLibur').DataTable({
                 pageLength: 8,
                 searching: true,
                 destroy: true,
                 order: [[0, 'desc']],
-                dom: 'Bftip',
-                buttons: [
-                    { extend: 'copy', title: 'Libur Khusus' },
-                    { extend: 'excel', title: 'Libur Khusus', exportOptions: { columns: [0, 1] } },
-                    { extend: 'pdf', title: 'Libur Khusus', exportOptions: { columns: [0, 1] } },
-                    { extend: 'print', title: 'Libur Khusus', exportOptions: { columns: [0, 1] } },
-                    'colvis'
-                ],
-                columnDefs: [{ targets: 2, orderable: false }],
+                dom: 'ftip',
+                columnDefs: colDefs,
                 language: {
                     search: 'Cari:',
                     emptyTable: 'Belum ada data libur khusus',
