@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('pengguna', function (Blueprint $table) {
+        if (!Schema::hasTable('pengguna')) {
+            Schema::create('pengguna', function (Blueprint $table) {
 
             // PRIMARY KEY string
             $table->char('nomor_induk', 30)->primary();
@@ -32,6 +33,7 @@ return new class extends Migration {
             $table->string('password', 255);
             $table->char('aktif', 1)->default('1');
         });
+        }
     }
 
     public function down(): void

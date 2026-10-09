@@ -104,6 +104,7 @@ CREATE TABLE `cabang_gedung` (
 --
 
 INSERT INTO `cabang_gedung` (`id`, `lokasi`, `jam_masuk`, `jam_pulang`, `istirahat_mulai`, `istirahat_selesai`, `hari_libur`, `zona_waktu`, `aktif`) VALUES
+(0, 'System', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '', '1', '1'),
 (1, 'Cirebon', '07:30:00', '16:30:00', '11:30:00', '12:30:00', '0,6', '1', '1'),
 (2, 'Jakarta', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '', '1', '1'),
 (3, 'Ciamis', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '0,6', '1', '1'),

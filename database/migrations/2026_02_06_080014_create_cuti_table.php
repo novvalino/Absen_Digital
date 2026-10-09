@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('cuti', function (Blueprint $table) {
+        if (!Schema::hasTable('cuti')) {
+            Schema::create('cuti', function (Blueprint $table) {
             $table->increments('id'); // INT UNSIGNED 
 
             $table->char('nomor_induk', 30);
@@ -19,6 +20,7 @@ return new class extends Migration {
                   ->on('pengguna')
                   ->cascadeOnDelete();
         });
+        }
     }
 
     public function down(): void

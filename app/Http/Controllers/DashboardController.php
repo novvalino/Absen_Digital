@@ -132,7 +132,7 @@ class DashboardController extends Controller
                 // But if they just mean based on kategori string, we handle it if needed.
             }
 
-            if ($hakAkses == 1) { // Orang Tua
+            if ($hakAkses == 4) { // Orang Tua
                 return view('dashboard.orangtua', [
                     'totalHariMasuk' => $totalHariMasuk,
                     'totalHariEfektif' => $totalHariEfektif,

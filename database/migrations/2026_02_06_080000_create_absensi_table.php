@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('absensi', function (Blueprint $table) {
+        if (!Schema::hasTable('absensi')) {
+            Schema::create('absensi', function (Blueprint $table) {
             // INT UNSIGNED
             $table->increments('id');
 
@@ -31,6 +32,7 @@ return new class extends Migration {
                   ->on('mesin')
                   ->cascadeOnDelete();
         });
+        }
     }
 
     public function down(): void
