@@ -81,9 +81,6 @@
             <div class="p-3">
                 {{-- BRAND --}}
                 <div class="flex items-center gap-3 px-2 h-14 mb-1">
-                    <div class="avatar" style="width:2.5rem;height:2.5rem;font-size:1.05rem;box-shadow:0 8px 20px -6px rgba(99,102,241,.7)">
-                        <i class="bi bi-fingerprint"></i>
-                    </div>
                     <div class="sidebar-text overflow-hidden">
                         <div class="font-extrabold text-white text-[15px] tracking-wide leading-tight whitespace-nowrap">ABSENSI</div>
                         <div class="text-[10px] text-indigo-300 font-semibold tracking-[.18em] uppercase whitespace-nowrap">Cendekia System</div>
