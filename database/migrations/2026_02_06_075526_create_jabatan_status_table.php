@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('jabatan_status', function (Blueprint $table) {
+        if (!Schema::hasTable('jabatan_status')) {
+            Schema::create('jabatan_status', function (Blueprint $table) {
             $table->increments('id'); // INT UNSIGNED
 
             $table->string('jabatan_status', 255);
@@ -21,6 +22,7 @@ return new class extends Migration {
 
             $table->char('aktif', 1)->default('1');           
         });
+        }
     }
 
     public function down(): void

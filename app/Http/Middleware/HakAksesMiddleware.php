@@ -55,8 +55,8 @@ class HakAksesMiddleware
             ], 403);
         }
 
-        // Dapatkan nama hak akses dari relasi (kolom 'hak')
-        $userHakAkses = $hakAkses->hak;
+        // Dapatkan nama hak akses dari relasi (kolom 'hak'), ganti underscore dengan spasi agar cocok dengan web.php
+        $userHakAkses = str_replace('_', ' ', strtolower($hakAkses->hak ?? ''));
 
         // Periksa apakah user punya salah satu role yang diizinkan
         if (!in_array($userHakAkses, $roles)) {
@@ -64,14 +64,14 @@ class HakAksesMiddleware
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             
-            // return response()->view('errors.access_denied', [
-            //     'message' => "Akses ditolak. Anda memiliki role '{$userHakAkses}' tetapi membutuhkan: " . implode(', ', $roles),
-            //     'action' => 'logout',
-            //     'debug' => [
-            //         'user_role' => $userHakAkses,
-            //         'required_roles' => $roles,
-            //     ]
-            // ], 403);
+            return response()->view('errors.access_denied', [
+                'message' => "Akses ditolak. Anda memiliki role '{$userHakAkses}' tetapi membutuhkan: " . implode(', ', $roles),
+                'action' => 'logout',
+                'debug' => [
+                    'user_role' => $userHakAkses,
+                    'required_roles' => $roles,
+                ]
+            ], 403);
         }
 
         return $next($request);

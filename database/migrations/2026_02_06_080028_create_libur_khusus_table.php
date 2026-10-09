@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('libur_khusus', function (Blueprint $table) {
+        if (!Schema::hasTable('libur_khusus')) {
+            Schema::create('libur_khusus', function (Blueprint $table) {
             $table->increments('id'); // INT UNSIGNED
 
             $table->date('tanggal');
             $table->string('keterangan');
         });
+        }
     }
 
     public function down(): void

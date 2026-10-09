@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('mesin', function (Blueprint $table) {
+        if (!Schema::hasTable('mesin')) {
+            Schema::create('mesin', function (Blueprint $table) {
             $table->increments('id_mesin'); // INT UNSIGNED
 
             // Foreign key INT UNSIGNED
@@ -20,6 +21,7 @@ return new class extends Migration {
             $table->string('keterangan');
             $table->string('idmesin', 20)->unique();
         });
+        }
     }
 
     public function down(): void

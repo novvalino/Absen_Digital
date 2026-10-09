@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('denda_master', function (Blueprint $table) {
+        if (!Schema::hasTable('denda_master')) {
+            Schema::create('denda_master', function (Blueprint $table) {
             $table->unsignedInteger('id', true);  // INT UNSIGNED
             $table->integer('prioritas')->unique();
             $table->string('jenis', 100)->nullable();
@@ -16,6 +17,7 @@ return new class extends Migration {
             $table->integer('rupiah_selanjutnya')->nullable();
 
         });
+        }
     }
 
     public function down(): void

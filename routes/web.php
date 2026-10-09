@@ -27,7 +27,7 @@ Route::match(['get', 'post'], '/absensi-machine', [AbsensiController::class, 'st
 | Authenticated User Routes (Semua Role)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'hakAkses:orang tua,full,general'])->group(function () {
+Route::middleware(['auth', 'hakAkses:orang tua,full,general,nusabot'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
