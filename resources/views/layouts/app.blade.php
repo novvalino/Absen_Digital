@@ -151,6 +151,14 @@
                             class="nav-item {{ request()->is('absensi/pengguna*') ? 'active' : '' }}">
                             <i class="bi bi-clipboard-data-fill"></i><span class="sidebar-text truncate">Rekap Absensi</span>
                         </a>
+                        <a href="{{ url('/libur_khusus') }}" title="Libur"
+                            class="nav-item {{ request()->is('libur_khusus*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar2-heart-fill"></i><span class="sidebar-text truncate">Libur</span>
+                        </a>
+                        <a href="{{ url('/izin/siswa') }}" title="Izin / Sakit"
+                            class="nav-item {{ request()->is('izin/siswa*') ? 'active' : '' }}">
+                            <i class="bi bi-file-earmark-medical-fill"></i><span class="sidebar-text truncate">Izin / Sakit</span>
+                        </a>
                     @endif
                 </nav>
             </div>
