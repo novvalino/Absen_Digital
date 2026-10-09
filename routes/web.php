@@ -27,7 +27,7 @@ Route::match(['get', 'post'], '/absensi-machine', [AbsensiController::class, 'st
 | Authenticated User Routes (Semua Role)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'hakAkses:nusabot,full,general'])->group(function () {
+Route::middleware(['auth', 'hakAkses:orang tua,full,general'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -58,10 +58,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes (Role: Nusabot & Full)
+| Admin Routes (Role: Orang Tua & Full)
 |--------------------------------------------------------------------------
 */
-Route::middleware('hakAkses:nusabot,full')->group(function () {
+Route::middleware('hakAkses:orang tua,full')->group(function () {
 
     // Absensi Admin
     Route::prefix('absensi')->name('absensi.')->group(function () {

@@ -45,7 +45,7 @@
     $jabatanStatus = $user?->jabatanStatus;
     $hakAkses = $jabatanStatus?->hakAkses;
     $userRole = $hakAkses?->hak;
-    $isAdmin = in_array($userRole, ['nusabot', 'full']);
+    $isAdmin = in_array($userRole, ['orang tua', 'full']);
     $isGeneral = $userRole === 'general';
 
     $namaUser = $user?->nama ?? ($user?->name ?? 'User');
